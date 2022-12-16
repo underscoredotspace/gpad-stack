@@ -10,7 +10,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./entrypoint.d:/docker-entrypoint-initdb.d:ro
+      - ./entrypoint.d:/docker-entrypoint-initdb.d
     networks:
       - gpad-app
 
