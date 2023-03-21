@@ -6,7 +6,6 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -21,17 +20,6 @@ services:
     networks:
       - gpad-app
 
-  # registry:
-  #   # port 5000
-  #   image: registry:2
-  #   restart: unless-stopped
-  #   environment:
-  #     REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
-  #   volumes:
-  #     - registry_data:/data
-  #   networks:
-  #     - gpad-app
-
   caddy:
     build: ./caddy
     restart: unless-stopped
@@ -45,14 +33,53 @@ services:
     networks:
       - gpad-app
 
+  claude: 
+    build: git@github.com:underscoredotspace/claude-v2.git#use-discordjs-slash
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+        NODE_ENV: "production"
+        POSTGRES: $POSTGRES
+        DISCORD_APPID: $DISCORD_APPID
+        DISCORD_TOKEN: $DISCORD_TOKEN
+        CLAUDE_LOG: $CLAUDE_LOG
+        GUILD: $GUILD
+    networks:
+      - gpad-app
+
+  gpad-api:
+      build: git@github.com:underscoredotspace/discord-api#main
+      depends_on:
+        - db
+      restart: unless-stopped
+      environment:
+          NODE_ENV: "production"
+          POSTGRES: $POSTGRES
+          DISCORD_TOKEN: $DISCORD_TOKEN
+          GUILD_ID: $GUILD
+          DISCORD_CLIENT_ID: $DISCORD_CLIENT_ID
+          DISCORD_CLIENT_SECRET: $DISCORD_CLIENT_SECRET
+          DISCORD_CALLBACK: $DISCORD_CALLBACK
+          DISCORD_AUTH_SCOPE: $DISCORD_AUTH_SCOPE
+          LOGIN_REDIRECT_URL: $LOGIN_REDIRECT_URL
+          COOKIE_DOMAIN: $COOKIE_DOMAIN
+          COOKIE_NAME: $COOKIE_NAME
+          COOKIE_SECRET: $COOKIE_SECRET
+          CORS: $CORS
+          SUPER_USER: $SUPER_USER
+          WEB_ADMIN: $WEB_ADMIN
+      ports:
+          - 3001:3001
+      networks:
+          - gpad-app
+
 networks:
     gpad-app:
         name: gpad-app
 
 volumes:
   postgres_data:
-    external: true
   caddy_data:
     external: true
   caddy_config: 
-  # registry_data:
