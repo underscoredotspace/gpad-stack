@@ -17,6 +17,8 @@ services:
     # port 8080
     image: adminer
     restart: unless-stopped
+    ports:
+      - 8080:8080
     networks:
       - gpad-app
 
@@ -24,8 +26,8 @@ services:
     build: ./caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - 80:80
+      - 443:443
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
