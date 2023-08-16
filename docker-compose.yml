@@ -37,6 +37,19 @@ services:
     networks:
       - gpad-app
 
+  blue-two:
+    build: git@github.com:underscoredotspace/blue-two.git#manual_npsso
+    depends_on:
+      - db
+    restart: unless-stopped
+    environment:
+      NODE_ENV: "production"
+      POSTGRES: $POSTGRES
+    ports:
+      - 3002:3002
+    networks:
+      - gpad-app  
+
   claude: 
     build: git@github.com:underscoredotspace/claude-v2.git#use-discordjs-slash
     restart: unless-stopped
